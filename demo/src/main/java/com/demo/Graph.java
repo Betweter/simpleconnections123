@@ -1,6 +1,23 @@
 package com.demo;
 
+import java.util.ArrayList;
+import java.util.List;
+
 public class Graph {
+
+    List<Node> nodes = new ArrayList<>();
+    List<Road> roads = new ArrayList<>();
+
+    void connect(Node a, Node b, double distance, double limit) {
+
+        Road r = new Road(a, b, distance, limit);
+
+        roads.add(r);
+
+        a.roads.add(r);
+        b.roads.add(r);
+    }
+
     Graph(){
         Node Pilawin = new Node(0);
         Node Paryzew = new Node(1);
@@ -15,49 +32,43 @@ public class Graph {
         Node Miasteczkowo = new Node(10);
         Node Borowiki = new Node(11);
 
-        Pilawin.addEdge(Lisowyje, 13, 10);
-        Pilawin.addEdge(Paryzew, 12, 10);
+        nodes.add(Pilawin);
+        nodes.add(Paryzew);
+        nodes.add(Lisowyje);
+        nodes.add(Sojka);
+        nodes.add(Gawronin);
+        nodes.add(Kanielec);
+        nodes.add(Trojkacie);
+        nodes.add(Maloklatkowice);
+        nodes.add(Zielechow);
+        nodes.add(Eltonowka);
+        nodes.add(Miasteczkowo);
+        nodes.add(Borowiki);
 
-        Paryzew.addEdge(Pilawin, 12, 6);
-        Paryzew.addEdge(Borowiki, 8, 6);
+        connect(Pilawin, Lisowyje, 13, 30);
+        connect(Pilawin, Paryzew, 12, 30);
 
-        Lisowyje.addEdge(Pilawin, 13, 10);
-        Lisowyje.addEdge(Gawronin, 10, 10);
-        Lisowyje.addEdge(Kanielec, 11, 10);
-        Lisowyje.addEdge(Sojka, 12, 10);
+        connect(Paryzew, Borowiki, 8, 30);
 
-        Sojka.addEdge(Lisowyje, 12, 6);
-        Sojka.addEdge(Kanielec, 20, 6);
+        connect(Gawronin, Lisowyje, 10, 40);
+        connect(Kanielec, Lisowyje, 11, 30);
+        connect(Sojka, Lisowyje, 12, 30);
 
-        Gawronin.addEdge(Lisowyje, 10, 10);
-        Gawronin.addEdge(Borowiki, 13, 10);
-        Gawronin.addEdge(Trojkacie, 10, 10);
+        connect(Sojka, Kanielec, 20, 32);
 
-        Kanielec.addEdge(Lisowyje, 11, 6);
-        Kanielec.addEdge(Sojka, 20, 6);
-        Kanielec.addEdge(Maloklatkowice, 18, 6);
-        Kanielec.addEdge(Trojkacie, 17, 6);
+        connect(Gawronin, Borowiki, 13, 40);
+        connect(Gawronin, Trojkacie, 10, 40);
 
-        Trojkacie.addEdge(Kanielec, 17, 10);
-        Trojkacie.addEdge(Gawronin, 10, 10);
-        Trojkacie.addEdge(Miasteczkowo, 10, 10);
-        Trojkacie.addEdge(Zielechow, 14, 10);
+        connect(Kanielec, Maloklatkowice, 18, 15);
+        connect(Kanielec, Trojkacie, 17, 30);
 
-        Maloklatkowice.addEdge(Kanielec, 18, 6);
+        connect(Trojkacie, Miasteczkowo, 10, 30);
+        connect(Trojkacie, Zielechow, 14, 30);
 
-        Zielechow.addEdge(Trojkacie, 14, 10);
-        Zielechow.addEdge(Miasteczkowo, 12, 10);
-        Zielechow.addEdge(Eltonowka, 15, 10);
 
-        Eltonowka.addEdge(Zielechow, 15, 6);
+        connect(Zielechow, Miasteczkowo, 12, 30);
+        connect(Zielechow, Eltonowka, 15, 15);
 
-        Miasteczkowo.addEdge(Borowiki, 8, 10);
-        Miasteczkowo.addEdge(Trojkacie, 10, 10);
-        Miasteczkowo.addEdge(Zielechow, 12, 10);
-
-        Borowiki.addEdge(Paryzew, 8, 6);
-        Borowiki.addEdge(Gawronin, 13, 6);
-        Borowiki.addEdge(Miasteczkowo, 8, 6);
-        
+        connect(Miasteczkowo, Borowiki, 8, 40);
     }
 }
