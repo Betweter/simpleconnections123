@@ -10,4 +10,14 @@ public class Node {
     Node(int id) {
         this.id = id;
     }
+    
+    @Override
+    public boolean equals(Object o) {
+        return (o instanceof Node n) && n.id == id;
+    }
+
+    @Override
+    public int hashCode() {
+        return Integer.hashCode(id);
+    }
 }
