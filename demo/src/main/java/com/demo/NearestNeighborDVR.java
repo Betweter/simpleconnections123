@@ -12,8 +12,9 @@ public class NearestNeighborDVR {
         boolean useTime,
         RoadUpdate updater
     ) {
-
+        List<DVRframe> frames = new ArrayList<>();
         Node current = start;
+        System.out.println("DVR starts...\n");
 
         List<Node> route = new ArrayList<>();
         route.add(start);
@@ -21,6 +22,7 @@ public class NearestNeighborDVR {
         double totalCost = 0;
 
         List<Node> remaining = new ArrayList<>(toVisit);
+        frames.add(new DVRframe(start, route, remaining, graph));
 
         while (!remaining.isEmpty()) {
 
@@ -37,6 +39,10 @@ public class NearestNeighborDVR {
                     bestNode = candidate;
                     nextHop = r.nextNode;
                 }
+                if (bestNode == null || bestCost == Double.POSITIVE_INFINITY) {
+                    System.out.println("No reachable path to remaining destinations.");
+                    throw new IllegalStateException("Graph became disconnected due to road events.");
+                }
             }
 
             double nextCost = Double.POSITIVE_INFINITY;
@@ -50,29 +56,19 @@ public class NearestNeighborDVR {
             totalCost += nextCost;
             current = nextHop;
 
+    System.out.println("\nUpdatin the road, current - " + current.name);
+
             route.add(nextHop);
             if(nextHop == bestNode)
                 remaining.remove(nextHop);
-            updater.update();
+            updater.update(nextCost);
+            
+            frames.add(new DVRframe(current, route, remaining, graph.copy()));
+            if(current == end)
+                break;
         }
 
-        PathResult finalPath = Dijkstra.search(current, end, useTime);
-
-        totalCost += finalPath.cost;
-        route.add(end);
-
-        return new Result(route, totalCost);
+        updater.resetAllLimits();
+        return new Result(route, totalCost, frames);
     }
 }
-/*
-    the starting point, the endpoint end the list of nodes to visit is provided
-    we keep the list of nodes to visit and the final one.
-    by Dijkstra we compute the cost of visiting each one and choose the lowest.
-    We go to the lowest one, taking it off the todo list.
-    after every hop we have to update the values of time.
-    Then we recompute costs for remaining nodes.
-    
-    After clearing the list, we go to the final destination.
-    The distance and time are kept. Depending on the useTime value, Dijkstra can go by distance or time.
-    This way we can emulate, a postman's gps for example.
-*/

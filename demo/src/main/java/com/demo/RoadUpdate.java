@@ -21,7 +21,14 @@ public class RoadUpdate {
         applyRandomEvents();
     }
 
-    private void resetAllLimits() {
+    public void update(double new_cost) {
+        this.new_hour += new_cost;
+        resetAllLimits();
+        applyTrafficJams();
+        applyRandomEvents();
+    }
+
+    public void resetAllLimits() {
         for (Road r : graph.roads)
             r.reset();
     }

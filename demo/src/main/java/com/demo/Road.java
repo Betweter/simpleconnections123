@@ -1,12 +1,12 @@
 package com.demo;
 
 public class Road {
-    Node a;
-    Node b;
+    public Node a;
+    public Node b;
 
-    double distance;
-    double baseLimit;
-    double currentLimit;
+    public double distance;
+    public double baseLimit;
+    public double currentLimit;
 
     Road(Node a, Node b, double distance, double limit) {
         this.a = a;
@@ -28,7 +28,7 @@ public class Road {
         currentLimit = newLimit;
     }
 
-    double travelTime() {
+    public double travelTime() {
         if (currentLimit == 0)
             return Double.POSITIVE_INFINITY;
 

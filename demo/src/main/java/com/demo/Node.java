@@ -4,11 +4,22 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class Node {
-    int id;
+    public int id;
+    public String name;
+    public int x = 0;
+    public int y = 0;
+
     List<Road> roads = new ArrayList<>();
 
     Node(int id) {
         this.id = id;
+    }
+
+    Node(int id, int x, int y, String name) {
+        this.id = id;
+        this.x = x;
+        this.y = y;
+        this.name = name;
     }
     
     @Override

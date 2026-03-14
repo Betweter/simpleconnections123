@@ -2,13 +2,15 @@ package com.demo;
 
 import java.util.List;
 
-class Result {
+public class Result {
 
-    List<Node> route;
-    double cost;
+    public List<Node> route;
+    public double cost;
+    public List<DVRframe> frames;
 
-    Result(List<Node> route, double cost) {
+    public Result(List<Node> route, double cost, List<DVRframe> frames) {
         this.route = route;
         this.cost = cost;
+        this.frames = frames;
     }
 }
