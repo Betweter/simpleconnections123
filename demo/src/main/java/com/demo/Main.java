@@ -19,17 +19,26 @@ public class Main {
 			JButton startBtn = new JButton("Start");
 			JButton finishBtn = new JButton("Finish");
 			JButton loadBtn = new JButton("Load");
+			JButton nextBtn = new JButton("Next");
+			JButton prevBtn = new JButton("Prev");
+			JButton resetBtn = new JButton("Reset");
 
 			stopsBtn.addActionListener(e -> panel.setState(1));
 			startBtn.addActionListener(e -> panel.setState(2));
 			finishBtn.addActionListener(e -> panel.setState(3));
 			loadBtn.addActionListener(e -> panel.load());
+			nextBtn.addActionListener(e -> panel.nextFrame());
+			prevBtn.addActionListener(e -> panel.prevFrame());
+			resetBtn.addActionListener(e -> panel.resetView());
 
 			JPanel controls = new JPanel();
 			controls.add(stopsBtn);
 			controls.add(startBtn);
 			controls.add(finishBtn);
 			controls.add(loadBtn);
+			controls.add(nextBtn);
+			controls.add(prevBtn);
+			controls.add(resetBtn);
 
 			JFrame frame = new JFrame();
 			frame.setLayout(new BorderLayout());

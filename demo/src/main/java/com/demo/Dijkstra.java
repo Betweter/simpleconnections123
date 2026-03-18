@@ -34,41 +34,32 @@ public class Dijkstra {
                 }
             }
         }
-        Node nextNode = reconstructNext(start, goal, prev);
+        List<Node> path = reconstructPath(start, goal, prev);
+        Node nextNode = path.size() > 1 ? path.get(1) : start;
 
-        return new PathResult(nextNode, dist.getOrDefault(goal, Double.POSITIVE_INFINITY));
+        return new PathResult(nextNode, dist.getOrDefault(goal, Double.POSITIVE_INFINITY), path);
     }
 
-    private static Node reconstructNext(Node start, Node goal, Map<Node, Node> prev) {
+    private static List<Node> reconstructPath(Node start, Node goal, Map<Node, Node> prev) {
+
+        List<Node> path = new ArrayList<>();
 
         Node step = goal;
-        while (prev.containsKey(step) && prev.get(step) != start)
-            step = prev.get(step);
 
-        return step;
+        if (!prev.containsKey(step) && step != start)
+            return path; // brak ścieżki
+
+        while (step != null) {
+            path.add(step);
+            step = prev.get(step);
+        }
+
+        Collections.reverse(path);
+
+        return path;
     }
 }
         /*
-        chcemy na podstawie boolean time wybrać czy wagą będzie road.distance czy road.distance/road.currentlimit
-        chcemy ustawić nextNode na następny w kolejności węzeł do odzwiedznia,
-        żeby droga była najkrótsza, a Needed to metryka, ile trzeba do końca
-        
-        for every node n {
-            dist[n] = inf;
-            prev[n] = null;
-            dist[a] = 0;
-            all nodes unexplored
-        }
-        while(b unexplored){
-            n = least-valued uneplored node
-            explore n;
-            for each rode(n, r){
-                if(dist[n]+len(n,r) < dist[r]){
-                    dist[r] = dist[n] + len(n,r);
-                    prev[r] = n;
-                } 
-            }
-        }
         PathResult result = Dijkstra.search(A, B, true);
         Node next = result.nextNode;
         double needed = result.cost;

@@ -4,7 +4,6 @@ import java.util.*;
 import java.util.List;
 
 import javax.swing.*;
-import javax.swing.Timer;
 
 import com.demo.*;
 import java.awt.*;
@@ -15,6 +14,7 @@ import java.awt.event.MouseEvent;
 public class GraphPanel extends JPanel {
 
     private Graph graph;
+    private Graph oggraph;
     private final Map<Node, Point> positions = new HashMap<>();
     private Node vehicleNode = null;
     private List<Node> stops = new ArrayList<>();
@@ -22,7 +22,11 @@ public class GraphPanel extends JPanel {
     private Node finish = null;
     private int state = 2;//0 - default, 1- choose stops, 2 - choose start, 3 - choose finish
     private static final int NODE_RADIUS = 10;
+    private List<DVRframe> frames;
+    private List<Node> path;
     private int frameIndex = 0;
+    private double totalCost = 0;
+    private String overlayText = "";
     
 
     public GraphPanel(Graph graph) {
@@ -95,6 +99,10 @@ public class GraphPanel extends JPanel {
 
         drawRoads(g2);
         drawNodes(g2);
+
+        g2.setColor(Color.BLACK);
+        g2.setFont(new Font("Arial", Font.BOLD, 14));
+        g2.drawString(overlayText, 10, 20);
     }
 
     private void drawRoads(Graphics2D g2) {
@@ -132,7 +140,9 @@ public class GraphPanel extends JPanel {
             Point p = positions.get(n);
 
             g2.setColor(Color.BLUE);
-
+            if(path != null)
+                if(path.contains(n))
+                    g2.setColor(Color.CYAN);
             if(stops != null)
                 if(stops.contains(n))
                     g2.setColor(Color.ORANGE);
@@ -188,8 +198,7 @@ public class GraphPanel extends JPanel {
 
     public void load(){
         this.state = 0;
-        frameIndex = 0;
-        Graph oggraph = this.graph.copy();
+        this.oggraph = this.graph.copy();
 
         if(start == null || finish == null || stops == null || stops.isEmpty()){
             System.out.println("coś nie pykło");
@@ -203,39 +212,8 @@ public class GraphPanel extends JPanel {
         try {
             result = NearestNeighborDVR.solve(start, finish, stops, graph, true, updater);
 
-            List<DVRframe> frames = result.frames;
-        
-            Timer timer = new Timer(1000, e -> {
-
-                if(frameIndex < frames.size()) {
-
-                    DVRframe f = frames.get(frameIndex);
-
-                    setVehicleNode(f.vehicle);
-                    this.graph = f.graph;
-                    this.stops = f.remaining;
-
-                    frameIndex++;
-
-                    System.out.println("frameindex and framessize:" + frameIndex + ";" + frames.size());
-
-                    repaint();
-                } else {
-
-                    System.out.println("finishing if");
-
-                    this.graph = oggraph;
-                    setVehicleNode(null);
-                    start = null;
-                    finish = null;
-                    stops = new ArrayList<>();
-
-                    ((Timer) e.getSource()).stop();
-
-                    repaint();
-                }
-            });
-            timer.start();
+            this.frames = result.frames;
+            showFrame(frameIndex);
             repaint(); 
         
         } catch(IllegalStateException e){
@@ -248,8 +226,75 @@ public class GraphPanel extends JPanel {
             this.stops = new ArrayList<>();
             start = null;
             finish = null;
+            frameIndex = 0;
             this.graph = oggraph;
             repaint();
         }    
     }  
+
+    private void showFrame(int index){
+
+        if(frames == null || index < 0 || index >= frames.size())
+            return;
+
+        DVRframe f = frames.get(index);
+        
+        if(index+1 < frames.size()){
+            DVRframe f1 = frames.get(index +1);
+            this.path = f1.path;
+        }else this.path = null;
+
+        setVehicleNode(f.vehicle);
+        this.graph = f.graph;
+        this.stops = f.remaining;
+        this.totalCost = f.totalCost;
+
+        setOverlayText(
+            String.format(
+                "Frame: %d/%d, Cost: %.2f h",
+                frameIndex,
+                frames.size() - 1,
+                this.totalCost
+            )
+        );
+
+        repaint();
+    }
+
+    public void nextFrame(){
+
+        if(frames == null) return;
+
+        if(frameIndex < frames.size() - 1){
+            frameIndex++;
+            showFrame(frameIndex);
+        }
+    }
+    public void prevFrame(){
+
+        if(frames == null) return;
+
+        if(frameIndex > 0){
+            frameIndex--;
+            showFrame(frameIndex);
+        }
+    }
+    public void resetView(){
+        this.graph = oggraph;
+        setVehicleNode(null);
+        start = null;
+        finish = null;
+        stops = new ArrayList<>();
+        frames = null;
+        path = null;
+        frameIndex = 0;
+        totalCost = 0;
+
+        repaint();
+    }
+
+    public void setOverlayText(String text){
+        this.overlayText = text;
+        repaint();
+    }
 }

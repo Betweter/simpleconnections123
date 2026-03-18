@@ -20,15 +20,19 @@ public class NearestNeighborDVR {
         route.add(start);
 
         double totalCost = 0;
+        boolean itsjoever = false;
 
         List<Node> remaining = new ArrayList<>(toVisit);
-        frames.add(new DVRframe(start, route, remaining, graph));
+        remaining.remove(end);
+
+        frames.add(new DVRframe(start, route, remaining, graph, null, 0));
 
         while (!remaining.isEmpty()) {
 
             Node bestNode = null;
             Node nextHop = null;
             double bestCost = Double.POSITIVE_INFINITY;
+            List<Node> path = null;
 
             for (Node candidate : remaining) {
 
@@ -38,6 +42,7 @@ public class NearestNeighborDVR {
                     bestCost = r.cost;
                     bestNode = candidate;
                     nextHop = r.nextNode;
+                    path = r.path;
                 }
                 if (bestNode == null || bestCost == Double.POSITIVE_INFINITY) {
                     System.out.println("No reachable path to remaining destinations.");
@@ -46,25 +51,33 @@ public class NearestNeighborDVR {
             }
 
             double nextCost = Double.POSITIVE_INFINITY;
-
+            
             for (Road r : current.roads) {
-                if (r.other(current) == nextHop) {
+                if (r.other(current).equals(nextHop)) {
                     nextCost = useTime ? r.travelTime() : r.distance;
                     break;
                 }
             }
+            if(current.equals(nextHop))
+                nextCost = 0;
+
+            System.out.println("koszt: " + totalCost);
             totalCost += nextCost;
             current = nextHop;
 
-    System.out.println("\nUpdatin the road, current - " + current.name);
+            System.out.println("\nUpdatin the road, current - " + current.name);
 
             route.add(nextHop);
             if(nextHop == bestNode)
                 remaining.remove(nextHop);
             updater.update(nextCost);
+            if(remaining.isEmpty() && !itsjoever){
+                remaining.add(end);
+                itsjoever = true;
+            }
             
-            frames.add(new DVRframe(current, route, remaining, graph.copy()));
-            if(current == end)
+            frames.add(new DVRframe(current, route, remaining, graph.copy(), path, totalCost));
+            if(current == end && itsjoever)
                 break;
         }
 
